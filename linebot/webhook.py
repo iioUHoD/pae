@@ -1,16 +1,3 @@
-# -*- coding: utf-8 -*-
-
-#  Licensed under the Apache License, Version 2.0 (the "License"); you may
-#  not use this file except in compliance with the License. You may obtain
-#  a copy of the License at
-#
-#       https://www.apache.org/licenses/LICENSE-2.0
-#
-#  Unless required by applicable law or agreed to in writing, software
-#  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
-#  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
-#  License for the specific language governing permissions and limitations
-#  under the License.
 
 """linebot.http_client webhook."""
 
@@ -38,59 +25,20 @@ from .utils import LOGGER, PY3, safe_compare_digest
 
 if hasattr(hmac, "compare_digest"):
     def compare_digest(val1, val2):
-        """compare_digest function.
 
-        If hmac module has compare_digest function, use it.
-        Or not, use linebot.utils.safe_compare_digest.
-
-        :param val1: string or bytes for compare
-        :type val1: str | bytes
-        :param val2: string or bytes for compare
-        :type val2: str | bytes
-        :rtype: bool
-        :return: result
-        """
         return hmac.compare_digest(val1, val2)
 else:
     def compare_digest(val1, val2):
-        """compare_digest function.
-
-        If hmac module has compare_digest function, use it.
-        Or not, use linebot.utils.safe_compare_digest.
-
-        :param val1: string or bytes for compare
-        :type val1: str | bytes
-        :param val2: string or bytes for compare
-        :type val2: str | bytes
-        :rtype: bool
-        :return: result
-        """
-        return safe_compare_digest(val1, val2)
+rn safe_compare_digest(val1, val2)
 
 
 class SignatureValidator(object):
-    """Signature validator.
 
-    https://devdocs.line.me/en/#webhook-authentication
-    """
 
     def __init__(self, channel_secret):
-        """__init__ method.
-
-        :param str channel_secret: Channel secret (as text)
-        """
         self.channel_secret = channel_secret.encode('utf-8')
 
     def validate(self, body, signature):
-        """Check signature.
-
-        https://devdocs.line.me/en/#webhook-authentication
-
-        :param str body: Request body (as text)
-        :param str signature: X-Line-Signature value (as text)
-        :rtype: bool
-        :return: result
-        """
         gen_signature = hmac.new(
             self.channel_secret,
             body.encode('utf-8'),
@@ -106,20 +54,11 @@ class WebhookParser(object):
     """Webhook Parser."""
 
     def __init__(self, channel_secret):
-        """__init__ method.
 
-        :param str channel_secret: Channel secret (as text)
-        """
         self.signature_validator = SignatureValidator(channel_secret)
 
     def parse(self, body, signature):
-        """Parse webhook request body as text.
 
-        :param str body: Webhook request body (as text)
-        :param str signature: X-Line-Signature value (as text)
-        :rtype: list[T <= :py:class:`linebot.models.events.Event`]
-        :return:
-        """
         if not self.signature_validator.validate(body, signature):
             raise InvalidSignatureError(
                 'Invalid signature. signature=' + signature)
@@ -163,16 +102,6 @@ class WebhookHandler(object):
         self._default = None
 
     def add(self, event, message=None):
-        """[Decorator] Add handler method.
-
-        :param event: Specify a kind of Event which you want to handle
-        :type event: T <= :py:class:`linebot.models.events.Event` class
-        :param message: (optional) If event is MessageEvent,
-            specify kind of Messages which you want to handle
-        :type: message: T <= :py:class:`linebot.models.messages.Message` class
-        :rtype: func
-        :return: decorator
-        """
         def decorator(func):
             if isinstance(message, (list, tuple)):
                 for it in message:
@@ -185,11 +114,6 @@ class WebhookHandler(object):
         return decorator
 
     def default(self):
-        """[Decorator] Set default handler method.
-
-        :rtype: func
-        :return:
-        """
         def decorator(func):
             self._default = func
             return func
@@ -197,11 +121,7 @@ class WebhookHandler(object):
         return decorator
 
     def handle(self, body, signature):
-        """Handle webhook.
-
-        :param str body: Webhook request body (as text)
-        :param str signature: X-Line-Signature value (as text)
-        """
+      
         events = self.parser.parse(body, signature)
 
         for event in events:
